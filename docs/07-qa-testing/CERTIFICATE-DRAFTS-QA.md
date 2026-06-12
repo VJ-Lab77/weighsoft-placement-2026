@@ -4,7 +4,7 @@
 **Student:** Victoria Julius  
 **Feature:** Certificate Drafts (weighbridge calibration wizard)  
 **Branch:** `feature/certificate-drafts` (backend + frontend)  
-**Last updated:** 7 June 2026
+**Last updated:** 12 June 2026
 
 ---
 
@@ -37,8 +37,8 @@
 | 7 | Validation — step advance | Enter only 2 complete readings; click **Next** | Blocked on Step 2 with validation message | **Pass** (code: `validateCurrentStep` runs step2 rules) |
 | 8 | Step 3 calculations | Save draft with 3 readings; advance to Step 3 | `combined_uncertainty`, `expanded_uncertainty`, Conforms populated | **Pass** (server calculates on save) |
 | 9 | Auto-save | Edit a saved draft; wait ~30 seconds | `Last saved` timestamp updates | **Pass** (30s `$interval` in edit controller) |
-| 10 | Browser refresh | Save a draft; refresh; reopen same draft | Data restored from server | Manual verify |
-| 11 | Submit draft | Open a `draft` on Step 4; click **Submit Certificate** | Status `submitted`; fields read-only | Manual verify |
+| 10 | Browser refresh | Save a draft; refresh; reopen same draft | Data restored from server | **Verify in browser** — API persists to MySQL |
+| 11 | Submit draft | Open a `draft` on Step 4; click **Submit Certificate** | Status `submitted`; fields read-only | **Verify in browser** — `POST /api/certificate-drafts/{id}/submit` implemented |
 | 12 | Submit button (prod scenario) | Login as technician with `role_id` > 2 | Submit button hidden | Skip locally — `tech@demo.local` is `role_id: 1` |
 | 13 | Delete draft | Delete a `draft` from list | Soft-deleted; removed from list | **Pass** |
 | 14 | Delete submitted | Try to delete a `submitted` draft as non-admin | Blocked with info message | Skip locally — tech is admin locally |
@@ -84,7 +84,18 @@ php artisan test --filter=CertificateDraft
 
 ---
 
-## 6. Sign-off
+## 6. Task 6 — Company Admin (related)
+
+| Item | Status |
+|------|--------|
+| `certificate_prefix` on company form | **Done** |
+| Prefix used in cert number generation | **Done** |
+| `certificate_drafts` on User Types form | **Done** (12 Jun 2026) |
+| Dashboard draft count card | Deferred (Could) |
+
+---
+
+## 7. Sign-off
 
 | Role | Name | Date | Approved |
 |------|------|------|----------|

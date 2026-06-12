@@ -231,11 +231,12 @@ flowchart TD
 
 ## 9. Acceptance criteria (summary)
 
-- [ ] Company form saves and loads `certificate_prefix`
-- [ ] New drafts use prefix in certificate number
-- [ ] User type with `certificate_drafts = false` does not see menu item
-- [ ] User type with `certificate_drafts = true` sees menu item
-- [ ] Admin can submit drafts; technician cannot
+- [x] Company form saves and loads `certificate_prefix`
+- [x] New drafts use prefix in certificate number (`CertificateDraftService::generateCertificateNumber`)
+- [x] User type with `certificate_drafts = false` does not see menu item (`services.js`)
+- [x] User type with `certificate_drafts = true` sees menu item
+- [x] User Types form exposes Certificate Drafts permission (`user_type.js`)
+- [x] Admin can submit drafts; technician cannot (role_id 1–2)
 - [ ] (Could) Dashboard shows pending draft count
 - [ ] (Could) User list shows company/site names
 
