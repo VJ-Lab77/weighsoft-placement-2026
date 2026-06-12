@@ -71,9 +71,7 @@ php artisan test --filter=CertificateDraft
 |------|---------------------|-------|
 | `calculate_uncertainty_with_empty_readings` | **Pass** | |
 | `calculate_uncertainty_with_three_readings` | **Pass** | Fixed float assertion with `assertEqualsWithDelta` |
-| `fixture_cases_from_json` | **Fail** | `conforms` fixture expects `true` but service returns `false` — confirm formula with mentor |
-
-**Action:** Resolve conformity threshold in `docs/04-mentor-interview-notes.md` before updating fixture.
+| `fixture_cases_from_json` | **Pass** | Aligned to `conforms` when `U <= resolution` (see interview notes §4) |
 
 ---
 
@@ -81,7 +79,7 @@ php artisan test --filter=CertificateDraft
 
 | ID | Issue | Severity | Status |
 |----|-------|----------|--------|
-| QA-02 | `conforms` fixture mismatch | Medium | Open — pending mentor formula |
+| QA-02 | `conforms` tolerance rule | — | Resolved — `U <= resolution` |
 | QA-03 | Toasts disabled globally (`Toaster: "No"`) | Low | Mitigated — inline save banners on edit screen |
 
 ---

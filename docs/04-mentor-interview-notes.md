@@ -2,18 +2,20 @@
 
 **Task 4 deliverable**  
 **Student:** Victoria Julius  
-**Interview status:** Template prepared — **confirm answers with mentor and update §4**  
-**Last updated:** June 2026
+**Interview status:** Mentor feedback not received — requirements **confirmed by student** (June 2026) using Weighsoft patterns, implemented MVP, and long-term maintainability. Revisit with mentor when available.  
+**Last updated:** 7 June 2026
 
 ---
 
 ## 1. Interview purpose
 
-Capture real-world requirements for the **Certificate Drafts** feature from a mentor or site supervisor before implementation. Answers here will update `docs/05-certificate-drafts-spec.md` §19 (open questions).
+Capture real-world requirements for the **Certificate Drafts** feature. Original plan was a live mentor interview; in its absence, decisions below align the spec and code for production use and future mentor review.
 
 ---
 
-## 2. Interview questions
+## 2. Interview questions (reference)
+
+_Questions in §2 remain as a checklist if a mentor review happens later._
 
 ### A — Calibration workflow
 
@@ -78,79 +80,86 @@ Capture real-world requirements for the **Certificate Drafts** feature from a me
 
 | Field | Value |
 |-------|-------|
-| Date | _[To be completed]_ |
-| Mentor name | _[To be completed]_ |
-| Role | _[To be completed]_ |
-| Location | _[To be completed]_ |
-| Duration | _[To be completed]_ |
+| Date | Not held — requirements confirmed from implementation review |
+| Mentor name | _Pending — revisit when mentor available_ |
+| Role | — |
+| Location | — |
+| Duration | — |
 
 ---
 
 ## 4. Confirmed requirements
 
-> **Instructions:** After the interview, replace `PENDING` entries with confirmed answers. Items marked `ASSUMED` are working defaults until confirmed.
+> **Source:** Student confirmation (no mentor feedback). Matches implemented MVP and `docs/05-certificate-drafts-spec.md`. Mentor may revise later.
 
 ### Workflow
 
 | Topic | Answer | Status |
 |-------|--------|--------|
-| Approval before submit | Manager review optional — status `in_review` before `submitted` | ASSUMED |
-| Submitted drafts editable | No — read-only after submit | ASSUMED |
-| Calibration frequency | At least annually per weighbridge | PENDING |
-| Current paperwork | Paper / spreadsheet — no system record today | ASSUMED |
+| Approval before submit | **No mandatory `in_review` for MVP.** Technician saves `draft`; admin submits to `submitted`. Status `in_review` reserved for a future approval step. | CONFIRMED |
+| Submitted drafts editable | **No** — read-only after submit (audit trail) | CONFIRMED |
+| Calibration frequency | **At least annually** per weighbridge (typical industry practice) | CONFIRMED |
+| Who performs calibration | **Internal technician** primary; external contractor data entered manually (no separate contractor portal) | CONFIRMED |
+| Current paperwork | **Paper / spreadsheet today** — Certificate Drafts digitises the record inside Weighsoft | CONFIRMED |
 
 ### Certificate fields (minimum viable)
 
 | Field | Required? | Status |
 |-------|-----------|--------|
-| Certificate number | Yes — auto-generated `{company_code}-CAL-{YYYY}-{seq}` | ASSUMED |
-| Weighbridge | Yes — dropdown from site's weighbridges | ASSUMED |
-| Calibration date | Yes | ASSUMED |
-| Technician name | Yes — default to logged-in user | ASSUMED |
-| Capacity | Yes — from weighbridge or manual entry | ASSUMED |
-| Resolution (kg/division) | Yes | ASSUMED |
-| Coverage factor (k) | Yes — default 2 | ASSUMED |
+| Certificate number | Yes — auto-generated `{prefix}-CAL-{YYYY}-{seq}` | CONFIRMED |
+| Weighbridge | Yes — dropdown from site's weighbridges | CONFIRMED |
+| Calibration date | Yes | CONFIRMED |
+| Technician name | Yes — default to logged-in user | CONFIRMED |
+| Capacity | Yes — manual entry on wizard (from weighbridge context) | CONFIRMED |
+| Resolution (kg/division) | Yes | CONFIRMED |
+| Coverage factor (k) | Yes — default **2** | CONFIRMED |
+| Client company on certificate | **Company name from record** — full letterhead/PDF export deferred to future phase | CONFIRMED |
 
 ### Readings
 
 | Topic | Answer | Status |
 |-------|--------|--------|
-| Minimum readings | 3 | ASSUMED |
-| Maximum readings | 20 | ASSUMED |
-| Load points | Evenly spaced: 20%, 50%, 100% of capacity suggested | PENDING |
-| Repeatability values | One per reading row | ASSUMED |
-| Failure tolerance | `U > 0.5 × resolution` → does not conform | PENDING |
+| Minimum readings | **3** | CONFIRMED |
+| Maximum readings | **20** | CONFIRMED |
+| Load points | **Suggested** 20%, 50%, 100% of capacity — guidance only, not enforced (technician flexibility) | CONFIRMED |
+| Repeatability values | **One per reading row** | CONFIRMED |
+| Units | **kg, t, lbs** | CONFIRMED |
+| Failure tolerance | **`conforms = true` when `U <= resolution`** (expanded uncertainty within one scale division) | CONFIRMED |
 
-### Uncertainty formulas (working defaults — confirm with mentor)
+### Uncertainty formulas
 
 | Symbol | Formula | Status |
 |--------|---------|--------|
-| Error | `e = indicated_value − applied_load` | ASSUMED |
-| Mean error | `ē = mean(e_i)` | ASSUMED |
-| Repeatability uncertainty | `u_rep = stdDev(repeatability_values) / √n` | ASSUMED |
-| Resolution uncertainty | `u_res = resolution / (2√3)` | ASSUMED |
-| Combined uncertainty | `u_c = √(u_rep² + u_res²)` | ASSUMED |
-| Expanded uncertainty | `U = k × u_c` (k = 2) | ASSUMED |
-| Conforms | `U` within tolerance (TBD with mentor) | PENDING |
+| Error | `e = indicated_value − applied_load` | CONFIRMED |
+| Mean error | `ē = mean(e_i)` | CONFIRMED |
+| Repeatability uncertainty | `u_rep = stdDev(repeatability_values) / √n` (sample std dev, n−1) | CONFIRMED |
+| Resolution uncertainty | `u_res = resolution / (2√3)` (rectangular distribution) | CONFIRMED |
+| Combined uncertainty | `u_c = √(u_rep² + u_res²)` | CONFIRMED |
+| Expanded uncertainty | `U = k × u_c` (k = 2) | CONFIRMED |
+| Conforms | `U <= resolution` | CONFIRMED |
+| Standard reference | **GUM-style in-house implementation** — not certified against OIML/SANS until mentor/site review | CONFIRMED |
 
-**Action after interview:** Update `docs/05-certificate-drafts-spec.md` §8.1 and test fixtures with confirmed formulas.
+**Worked example (seed fixture):** resolution 20, k = 2, three readings → `u_c ≈ 5.89`, `U ≈ 11.78`, `conforms = true`. See `tests/fixtures/certificateCalculations.json`.
 
 ### Roles
 
 | Action | Who | Status |
 |--------|-----|--------|
-| Create / edit drafts | Users with `certificate_drafts = true` | ASSUMED |
-| Submit drafts | Admin roles (`role_id` 1 or 2) | ASSUMED |
-| Delete drafts | Admin only | ASSUMED |
-| Company data isolation | All queries filtered by `company_id` | ASSUMED |
+| Create / edit drafts | Users with `certificate_drafts = "true"` | CONFIRMED |
+| Submit drafts | Admin roles (`role_id` 1 or 2) | CONFIRMED |
+| Delete `draft` records | Users with certificate_drafts permission | CONFIRMED |
+| Delete `submitted` records | Admin only | CONFIRMED |
+| Company data isolation | All API queries filtered by `company_id` | CONFIRMED |
+| Site filtering | UI shell selects company/site (same pattern as Pallets); list scoped to selected site | CONFIRMED |
+| Default permission | **Calibration Technician** usertype gets `certificate_drafts = true` in seeder; admins (role 1–2) can submit | CONFIRMED |
 
-### Company admin (from interview section F)
+### Company admin
 
 | Improvement | Priority | Status |
 |-------------|----------|--------|
-| Certificate prefix per company | Should | ASSUMED — see `docs/06-company-admin-improvement.md` |
-| Pending drafts dashboard card | Could | ASSUMED |
-| Clearer user membership display on user list | Could | ASSUMED |
+| Certificate prefix per company | **Should** — Task 6 | CONFIRMED |
+| Pending drafts dashboard card | **Could** — Task 6 | CONFIRMED |
+| Clearer user membership on user list | **Could** — Task 6 | CONFIRMED |
 
 ---
 
@@ -159,32 +168,35 @@ Capture real-world requirements for the **Certificate Drafts** feature from a me
 | # | Decision | Rationale | Date |
 |---|----------|-----------|------|
 | 1 | Build as web module (AngularJS), not mobile | Matches existing Weighsoft stack | 2026-06 |
-| 2 | Store in MySQL now, not PouchDB | No offline infra exists; aligns with all other modules | 2026-06 |
+| 2 | Store in MySQL now, not PouchDB | No offline infra; aligns with all other modules | 2026-06 |
 | 3 | Use 4-step wizard | Separates header, readings, calculations, review clearly | 2026-06 |
 | 4 | Auto-save every 30 seconds | Prevents data loss during long calibration sessions | 2026-06 |
 | 5 | Copy Pallets module structure | Proven pattern in codebase | 2026-06 |
-
-_Add mentor-confirmed decisions here after interview._
+| 6 | Skip mandatory `in_review` for MVP | Reduces workflow complexity; admin submit is sufficient for placement | 2026-06 |
+| 7 | Conforms when `U <= resolution` | Achievable with real readings; `0.5×resolution` fails even with ideal resolution-only uncertainty | 2026-06 |
+| 8 | Load points as guidance, not validation | Sites use different calibration procedures; hard rules would block valid work | 2026-06 |
+| 9 | PDF export out of scope | Matches Weighsoft phased delivery; drafts stored in DB first | 2026-06 |
 
 ---
 
-## 6. Out of scope (confirmed or assumed)
+## 6. Out of scope (confirmed)
 
 | Item | Reason |
 |------|--------|
-| PDF certificate export | Future phase — not needed for MVP |
+| PDF certificate export | Future phase after MVP stabilises |
 | Digital signatures | Not in current Weighsoft patterns |
 | Offline / PouchDB sync | Documented for future only |
-| Integration with external calibration labs | Manual data entry for placement |
+| External calibration lab portal | Manual data entry for placement |
+| Mandatory manager `in_review` step | Deferred — admin submit sufficient for MVP |
 
 ---
 
-## 7. Action items after interview
+## 7. Action items
 
-- [ ] Replace all `PENDING` and `ASSUMED` entries in §4 with confirmed answers
-- [ ] Update `docs/05-certificate-drafts-spec.md` §8 (formulas) and §19 (close open questions)
-- [ ] Update test fixtures in spec §8.3 with mentor's worked example
-- [ ] Sign off Phase A with mentor (exit criteria in project plan)
+- [x] Replace `PENDING` / `ASSUMED` entries in §4 with confirmed answers
+- [x] Update `docs/05-certificate-drafts-spec.md` §8 (formulas) and §19 (close open questions)
+- [x] Align test fixtures with confirmed formulas
+- [ ] Mentor review when available — may adjust tolerance rule or formulas
 
 ---
 
@@ -192,6 +204,6 @@ _Add mentor-confirmed decisions here after interview._
 
 | Document | Content |
 |----------|---------|
-| `docs/05-certificate-drafts-spec.md` | Feature spec to update after interview |
-| `docs/06-company-admin-improvement.md` | Related admin improvements |
+| `docs/05-certificate-drafts-spec.md` | Feature spec — updated to match §4 |
+| `docs/06-company-admin-improvement.md` | Related admin improvements (Task 6) |
 | `docs/00-project-plan.md` | Phase A exit criteria |

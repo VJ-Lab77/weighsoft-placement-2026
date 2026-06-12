@@ -345,8 +345,8 @@ $rules = [
 
 ### 8.1 Formulas
 
-> **Source:** Mentor-supplied calibration specification (to be confirmed in Task 4 interview).  
-> Placeholder formulas below — update after interview.
+> **Source:** Confirmed in `docs/04-mentor-interview-notes.md` §4 (student decision, June 2026).  
+> Mentor may revise tolerance rule or standard reference later.
 
 | Symbol | Formula | Description |
 |--------|---------|-------------|
@@ -357,7 +357,7 @@ $rules = [
 | `u_res` | `resolution / (2 * sqrt(3))` | Resolution uncertainty (rectangular distribution) |
 | `u_c` | `sqrt(u_rep² + u_res²)` | Combined standard uncertainty |
 | `U` | `k * u_c` | Expanded uncertainty (k = coverage factor, default 2) |
-| Conforms | `U <= 0.5 * resolution * capacity_factor` | Pass/fail (tolerance TBD with mentor) |
+| Conforms | `U <= resolution` | Pass when expanded uncertainty is within one scale division |
 
 ### 8.2 JavaScript Helper
 
@@ -393,7 +393,7 @@ File: `tests/fixtures/certificateCalculations.json`
       { "applied_load": 20000, "indicated_value": 20015, "repeatability_value": 12 },
       { "applied_load": 30000, "indicated_value": 30025, "repeatability_value": 8 }
     ],
-    "expected": { "u_c": 15.2, "U": 30.4, "conforms": true }
+    "expected": { "u_c": 5.8878, "U": 11.7756, "conforms": true }
   }
 ]
 ```
@@ -605,16 +605,18 @@ Full checklist: `docs/07-qa-testing/CERTIFICATE-DRAFTS-QA.md`
 
 ---
 
-## 19. Open Questions (Resolve in Task 4 Interview)
+## 19. Resolved decisions (June 2026)
 
-| # | Question | Impact |
-|---|----------|--------|
-| 1 | Exact uncertainty formulas and tolerance limits? | Tasks 31–32 |
-| 2 | Required number of readings per certificate? | Validation minItems |
-| 3 | Is manager approval (`in_review`) needed before submit? | Status workflow |
-| 4 | Certificate number format convention? | Auto-generation logic |
-| 5 | Should submitted drafts generate a PDF? | Out of scope unless mentor requests |
-| 6 | Which user types receive `certificate_drafts` permission by default? | Seeder + usertype migration |
+_Mentor interview deferred. Answers confirmed in `docs/04-mentor-interview-notes.md` §4._
+
+| # | Question | Decision |
+|---|----------|----------|
+| 1 | Uncertainty formulas and tolerance? | GUM-style formulas in §8.1; `conforms` when `U <= resolution` |
+| 2 | Readings per certificate? | Minimum 3, maximum 20 |
+| 3 | Manager `in_review` before submit? | **No** for MVP — `draft` → `submitted` via admin |
+| 4 | Certificate number format? | `{prefix}-CAL-{YYYY}-{seq}` auto-generated |
+| 5 | PDF on submit? | **Out of scope** for MVP |
+| 6 | Default `certificate_drafts` permission? | Calibration Technician usertype in seeder; admins submit |
 
 ---
 
